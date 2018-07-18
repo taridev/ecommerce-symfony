@@ -18,3 +18,8 @@ validation:
     path:     /panier/validation
     defaults: { _controller: EcommerceBundle:Panier:validation }
 
+test:
+    path:     /test
+    defaults: { _controller: EcommerceBundle:Test:ajout }
+
+

@@ -5,7 +5,8 @@
     "autoload": {
         "psr-4": {
             "Pages\\": "src/Pages",
-            "Ecommerce\\": "src/Ecommerce"
+            "Ecommerce\\": "src/Ecommerce",
+            "Utilisateurs\\": "src/Utilisateurs"
         },
         "classmap": [
             "app/AppKernel.php",
@@ -21,6 +22,7 @@
         "php": ">=5.3.9",
         "doctrine/doctrine-bundle": "~1.4",
         "doctrine/orm": "^2.4.8",
+        "friendsofsymfony/user-bundle": "~2.0",
         "incenteev/composer-parameter-handler": "~2.0",
         "sensio/distribution-bundle": "~4.0",
         "sensio/framework-extra-bundle": "^3.0.2",
