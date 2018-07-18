@@ -1,3 +1,7 @@
 ecommerce:
     resource: "@EcommerceBundle/Resources/config/routing.yml"
     prefix:   /
+
+page:
+    resource: "@PagesBundle/Resources/config/routing.yml"
+    prefix:   /
