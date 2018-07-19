@@ -4,9 +4,19 @@ namespace Ecommerce\EcommerceBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Ecommerce\EcommerceBundle\Entity\Produits;
-
+use Ecommerce\EcommerceBundle\Form\TestType;
 class TestController extends Controller
 {
+    public function testFormulaireAction()
+    {
+        $form = $this->createForm(new TestType());
+        if ($this->get('request')->getMethod() === 'POST') {
+            $form->handleRequest($this->get('request'));
+            var_dump($form);
+        }
+        return $this->render('EcommerceBundle:Default:test.html.twig', array('form' => $form->createView()));
+    }
+
     public function ajoutAction()
     {
         $em = $this->getDoctrine()->getManager();
