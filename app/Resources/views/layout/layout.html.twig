@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/bootstrap-responsive.css') }}"/>
     <link rel="stylesheet" href="{{ asset('css/style.css') }}"/>
     <link rel="stylesheet" href="{{ asset('css/font-awesome.css') }}"/>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
     {% block stylesheets %}{% endblock %}
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}"/>
 </head>
@@ -43,8 +44,7 @@
             <div class="span4 offset1">
                 <h4>Informations</h4>
                 <ul class="nav nav-stacked">
-                    <li><a href="{{ path('page', { 'id': 1}) }}">CGV</a>
-                    <li><a href="{{ path('page', { 'id': 2}) }}">Mentions légales</a>
+                    {%  render(controller('PagesBundle:Pages:menu')) %}
                 </ul>
             </div>
 
