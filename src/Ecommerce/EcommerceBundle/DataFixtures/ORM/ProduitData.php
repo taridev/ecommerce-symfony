@@ -36,6 +36,7 @@ class ProduitData extends AbstractFixture implements OrderedFixtureInterface
                             ->setCategorie($this->getReference('category_'. basename($dossier)))
                             ->setDescription('Tunc rationabili cum gravius ideo constantia sub responderunt inopia efferatus orientis inopia et cum vilitatem et vertices iussit fixa unum.')
                             ->setPrix('3.99')
+                            ->setStock(10)
                             ->setDisponible(true);
                         $this->addReference('produit_'. basename($fichier), $produit);
                         $manager->persist($produit);

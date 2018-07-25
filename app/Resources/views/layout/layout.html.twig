@@ -24,10 +24,7 @@
             </button>
             <a class="brand" href="{{ path('produits') }}">[U'DEV] eCommerce</a>
             <div class="nav-collapse collapse">
-                <form class="navbar-form form-search pull-right">
-                    <input id="Search" name="Search" type="text" class="input-medium search-query">
-                    <button type="submit" class="btn">Rechercher</button>
-                </form>
+                {% render(controller('EcommerceBundle:Produits:recherche')) %}
             </div>
         </div>
     </div>
@@ -62,7 +59,7 @@
 
         <div class="row">
             <div class="span4">
-                <p>&copy; Copyright 2018 - [U'DEV]</p>
+                <p>&copy; Copyright {{ 'now' | date('Y') }} - [U'DEV]</p>
             </div>
         </div>
     </div>

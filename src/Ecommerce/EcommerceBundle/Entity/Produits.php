@@ -67,6 +67,32 @@ class Produits
      */
     private $disponible;
 
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="stock", type="integer")
+     */
+    private $stock;
+
+    /**
+     * @return int
+     */
+    public function getStock(): int
+    {
+        return $this->stock;
+    }
+
+    /**
+     * @param int $stock
+     *
+     * @return Produits
+     */
+    public function setStock(int $stock)
+    {
+        $this->stock = $stock;
+        return $this;
+    }
+
 
     /**
      * Get id

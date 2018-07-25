@@ -19,4 +19,15 @@ class ProduitsRepository extends \Doctrine\ORM\EntityRepository
             ->setParameter('categorie', $categorie);
         return $qb->getQuery()->getResult();
     }
+
+    public function recherche($chaine)
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->select('u')
+            ->where('u.nom LIKE :categorie')
+            ->andWhere('u.disponible = 1')
+            ->orderBy('u.id')
+            ->setParameter('categorie', '%'.$chaine.'%');
+        return $qb->getQuery()->getResult();
+    }
 }
