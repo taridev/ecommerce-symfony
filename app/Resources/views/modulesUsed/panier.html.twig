@@ -1,15 +1,27 @@
+{% set coutTotalHT = 0 %}
+{% for produit in produits %}
+    {% set coutTotalHT = coutTotalHT + produit.prix * panier[produit.id] %}
+{% endfor %}
 <div class="well">
     <div class="dropdown">
+        {% if panier | length > 0 %}
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="icon-shopping-cart"></i>
-            3 item - 54,27 €
-            <b class="caret"></b></a>
+            {% if panier | length == 1 %}
+                1 article - {{ coutTotalHT }} €
+            {% else %}
+                {{ panier | length }} articles - {{ coutTotalHT }} €
+            {% endif %}
+                <b class="caret"></b>
         </a>
+        {% else %}
+            <a href="#"><i class="icon-shopping-cart"></i> Panier vide</a>
+        {% endif %}
         <div class="dropdown-menu well" role="menu" aria-labelledby="dLabel">
-            <p>Item x 1 <span class="pull-right">18,09 €</span></p>
-            <p>Item x 1 <span class="pull-right">18,09 €</span></p>
-            <p>Item x 1 <span class="pull-right">18,09 €</span></p>
-            <a href="panier.php" class="btn btn-primary">Mon Panier</a>
+            {% for produit in produits %}
+                <p>{{ produit.nom }} x {{ panier[produit.id] }} <span class="pull-right">{{ produit.prix * panier[produit.id] }} €</span></p>
+            {% endfor %}
+            <a href="{{ path('panier') }}" class="btn btn-primary">Mon Panier</a>
         </div>
     </div>
 </div>

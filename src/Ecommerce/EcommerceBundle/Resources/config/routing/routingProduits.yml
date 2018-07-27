@@ -1,4 +1,4 @@
-produits :
+produits:
     path:     /
     defaults: { _controller: EcommerceBundle:Produits:produits }
 
