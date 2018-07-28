@@ -2,6 +2,9 @@
 
 namespace Ecommerce\EcommerceBundle\Controller;
 
+use Ecommerce\EcommerceBundle\Entity\Adresses;
+use Ecommerce\EcommerceBundle\Form\AdressesType;
+use function MongoDB\BSON\toJSON;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class PanierController extends Controller
@@ -85,9 +88,47 @@ class PanierController extends Controller
         );
     }
 
+    public function adresseSuppressionAction($id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $entity = $em->getRepository('EcommerceBundle:Adresses')
+            ->find($id);
+
+        // Gestion d'erreurs : Utilisateur correspond à l'adresse et adresse existe
+        if ($this->container->get('security.token_storage')->getToken()->getUser() === $entity->getUtilisateur() and is_object($entity)) {
+            $em->remove($entity);
+            $em->flush();
+        }
+
+        return $this->redirect($this->generateUrl('livraison'));
+    }
+
     public function livraisonAction()
     {
-        return $this->render('EcommerceBundle:Default:panier/layout/livraison.html.twig');
+        $entity = new Adresses();
+        $form = $this->createForm(new AdressesType(), $entity);
+        // Récupération de l'utilisateur
+        $utilisateur = $this->container->get('security.token_storage')->getToken()->getUser();
+
+        if ($this->get('request')->getMethod() === 'POST') {
+            $form->handleRequest($this->get('request'));
+            if ($form->isValid()) {
+                $em = $this->getDoctrine()->getManager();
+                $entity->setUtilisateur($utilisateur);
+                $em->persist($entity);
+                $em->flush();
+
+                return $this->redirect($this->generateUrl('livraison'));
+            }
+        }
+
+        return $this->render(
+            'EcommerceBundle:Default:panier/layout/livraison.html.twig',
+            array(
+                'form' => $form->createView(),
+                'utilisateur' => $utilisateur
+            )
+        );
     }
 
     public function validationAction()

@@ -2,16 +2,28 @@
 
 namespace Ecommerce\EcommerceBundle\Controller;
 
+use Ecommerce\EcommerceBundle\Entity\Categories;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Ecommerce\EcommerceBundle\Form\RechercheType;
 
 class ProduitsController extends Controller
 {
-    public function produitsAction()
+    public function produitsAction(Categories $categorie = null)
     {
         $session = $this->get('request')->getSession();
         $em = $this->getDoctrine()->getManager();
-        $produits = $em->getRepository('EcommerceBundle:Produits')->findBy(array('disponible' => 1));
+        if ($categorie != null) {
+            $produits = $em->getRepository('EcommerceBundle:Produits')
+                ->findBy(
+                    array(
+                        'categorie' => $categorie,
+                        'disponible' => 1
+                    )
+                );
+        } else {
+            $produits = $em->getRepository('EcommerceBundle:Produits')
+                ->findBy(array('disponible' => 1));
+        }
 
         if ($session->has('panier')) {
             $panier = $session->get('panier');
@@ -51,23 +63,6 @@ class ProduitsController extends Controller
                 'panier' => $panier,
             )
         );
-    }
-
-    public function categorieAction($id)
-    {
-        $em = $this->getDoctrine()->getManager();
-        $categorie = $em->getRepository('EcommerceBundle:Categories')->find($id);
-
-        if (!$categorie) {
-            throw $this->createNotFoundException('La catégorie n\'existe pas.');
-        }
-
-        $produits = $em->getRepository('EcommerceBundle:Produits')
-            ->findBy(array(
-                'categorie' => $id,
-                'disponible' => 1
-            ));
-        return $this->render('EcommerceBundle:Default:produits/layout/produits.html.twig', array('produits' => $produits));
     }
 
     public function rechercheAction()

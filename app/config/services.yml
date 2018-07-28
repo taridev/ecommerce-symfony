@@ -3,9 +3,3 @@
 parameters:
     #parameter_name: value
 
-services:
-    app.twig_extension:
-        class: Ecommerce\EcommerceBundle\Twig\Extension\TvaExtension
-        public: false
-        tags:
-            - { name: twig.extension }
