@@ -4,14 +4,14 @@ namespace Ecommerce\EcommerceBundle\Controller;
 
 use Ecommerce\EcommerceBundle\Entity\Adresses;
 use Ecommerce\EcommerceBundle\Form\AdressesType;
-use function MongoDB\BSON\toJSON;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class PanierController extends Controller
 {
-    public function menuAction()
+    public function menuAction(Request $request)
     {
-        $session = $this->get('request')->getSession();
+        $session = $request->getSession();
         if (!$session->has('panier')) {
             $session->set('panier', array());
         }
@@ -28,9 +28,9 @@ class PanierController extends Controller
         );
     }
 
-    public function ajouterAction($id)
+    public function ajouterAction($id, Request $request)
     {
-        $session = $this->get('request')->getSession();
+        $session = $request->getSession();
 
         if (!$session->has('panier')) {
             $session->set('panier', array());
@@ -39,12 +39,12 @@ class PanierController extends Controller
         $panier = $session->get('panier');
 
         if (array_key_exists($id, $panier)) {
-            if ($this->get('request')->query->get('qte') != null)
-                $panier[$id] = $this->get('request')->query->get('qte');
+            if ($request->query->get('qte') != null)
+                $panier[$id] = $request->query->get('qte');
             $this->get(('session'))->getFlashBag()->add('success', 'La quantité a bien été modifiée.');
         } else {
-            if ($this->get('request')->query->get('qte') != null) {
-                $panier[$id] = $this->get('request')->query->get('qte');
+            if ($request->query->get('qte') != null) {
+                $panier[$id] = $request->query->get('qte');
             } else {
                 $panier[$id] = "1";
             }
@@ -55,9 +55,9 @@ class PanierController extends Controller
         return $this->redirect($this->generateUrl('panier'));
     }
 
-    public function supprimerAction($id)
+    public function supprimerAction($id, Request $request)
     {
-        $session = $this->get('request')->getSession();
+        $session = $request->getSession();
         $panier = $session->get('panier');
 
         if (array_key_exists($id, $panier)) {
@@ -69,9 +69,10 @@ class PanierController extends Controller
         return $this->redirect($this->generateUrl('panier'));
     }
 
-    public function panierAction()
+    public function panierAction(Request $request)
     {
-        $session = $this->get('request')->getSession();
+        $session = $request->getSession();
+
         if (!$session->has('panier')) {
             $session->set('panier', array());
         }
@@ -83,16 +84,13 @@ class PanierController extends Controller
             'EcommerceBundle:Default:panier/layout/panier.html.twig',
             array(
                 'produits' => $produits,
-                'panier' => $session->get('panier')
-            )
-        );
+                'panier' => $session->get('panier')));
     }
 
     public function adresseSuppressionAction($id)
     {
         $em = $this->getDoctrine()->getManager();
-        $entity = $em->getRepository('EcommerceBundle:Adresses')
-            ->find($id);
+        $entity = $em->getRepository('EcommerceBundle:Adresses')->find($id);
 
         // Gestion d'erreurs : Utilisateur correspond à l'adresse et adresse existe
         if ($this->container->get('security.token_storage')->getToken()->getUser() === $entity->getUtilisateur() and is_object($entity)) {
@@ -103,15 +101,15 @@ class PanierController extends Controller
         return $this->redirect($this->generateUrl('livraison'));
     }
 
-    public function livraisonAction()
+    public function livraisonAction(Request $request)
     {
         $entity = new Adresses();
         $form = $this->createForm(new AdressesType(), $entity);
         // Récupération de l'utilisateur
         $utilisateur = $this->container->get('security.token_storage')->getToken()->getUser();
 
-        if ($this->get('request')->getMethod() === 'POST') {
-            $form->handleRequest($this->get('request'));
+        if ($request->getMethod() === 'POST') {
+            $form->handleRequest($request);
             if ($form->isValid()) {
                 $em = $this->getDoctrine()->getManager();
                 $entity->setUtilisateur($utilisateur);
@@ -131,8 +129,48 @@ class PanierController extends Controller
         );
     }
 
-    public function validationAction()
+    public function setLivraisonOnSession(Request $request)
     {
-        return $this->render('EcommerceBundle:Default:panier/layout/validation.html.twig');
+        $session = $request->getSession();
+
+        if (!$session->has('adresse'))
+            $session->set('adresse', array());
+
+        $adresse = $session->get('adresse');
+
+        if ($request->request->get('livraison') != null
+            and $request->request->get('facturation') != null) {
+            $adresse['livraison'] = $request->request->get('livraison');
+            $adresse['facturation'] = $request->request->get('facturation');
+        } else {
+            return $this->redirect($this->generateUrl('validation'));
+        }
+
+        $session->set('adresse', $adresse);
+        return $this->redirect($this->generateUrl('validation'));
+    }
+
+    public function validationAction(Request $request)
+    {
+        if ($request->getMethod() === 'POST') {
+            $this->setLivraisonOnSession($request);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $session = $request->getSession();
+        $adresse = $session->get('adresse');
+
+        $produits = $em->getRepository('EcommerceBundle:Produits')->findArray(array_keys($session->get('panier')));
+        $livraison = $em->getRepository('EcommerceBundle:Adresses')->find($adresse['livraison']);
+        $facturation = $em->getRepository('EcommerceBundle:Adresses')->find($adresse['facturation']);
+
+
+        return $this->render(
+            'EcommerceBundle:Default:panier/layout/validation.html.twig',
+            array('produits' => $produits,
+                'livraison' => $livraison,
+                'facturation' => $facturation,
+                'panier' => $session->get('panier')
+            ));
     }
 }

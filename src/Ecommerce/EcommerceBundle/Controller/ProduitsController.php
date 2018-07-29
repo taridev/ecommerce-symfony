@@ -5,12 +5,13 @@ namespace Ecommerce\EcommerceBundle\Controller;
 use Ecommerce\EcommerceBundle\Entity\Categories;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Ecommerce\EcommerceBundle\Form\RechercheType;
+use Symfony\Component\HttpFoundation\Request;
 
 class ProduitsController extends Controller
 {
-    public function produitsAction(Categories $categorie = null)
+    public function produitsAction(Categories $categorie = null, Request $request)
     {
-        $session = $this->get('request')->getSession();
+        $session = $request->getSession();
         $em = $this->getDoctrine()->getManager();
         if ($categorie != null) {
             $produits = $em->getRepository('EcommerceBundle:Produits')
@@ -40,9 +41,9 @@ class ProduitsController extends Controller
         );
     }
 
-    public function presentationAction($id)
+    public function presentationAction($id, Request $request)
     {
-        $session = $this->get('request')->getSession();
+        $session = $request->getSession();
         $em = $this->getDoctrine()->getManager();
         $produit = $em->getRepository('EcommerceBundle:Produits')->find($id);
 
@@ -71,13 +72,13 @@ class ProduitsController extends Controller
         return $this->render('EcommerceBundle:Default/recherche/modulesUsed:recherche.html.twig', array('form' => $form->createView()));
     }
 
-    public function rechercheTraitementAction()
+    public function rechercheTraitementAction(Request $request)
     {
         $form = $this->createForm(new RechercheType());
 
-        if ($this->get('request')->getMethod() === 'POST') {
+        if ($request->getMethod() === 'POST') {
             // $form->bind($this->get('request')); <- DEPRECATED
-            $form->handleRequest($this->get('request'));
+            $form->handleRequest($request);
             $em = $this->getDoctrine()->getManager();
             $produits = $em->getRepository('EcommerceBundle:Produits')->recherche($form['recherche']->getData());
             return $this->render('EcommerceBundle:Default:produits/layout/produits.html.twig', array('produits' => $produits));

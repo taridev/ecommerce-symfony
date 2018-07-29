@@ -1,58 +1,91 @@
-{%  extends"::layout/layout.html.twig" %}
-{%  block body %}
+{% extends"::layout/layout.html.twig" %}
+
+{% set totalHT = 0 %}
+{% set totalTTC = 0 %}
+
+{% block body %}
+
     <div class="container">
         <div class="row">
-
             <div class="span3">
                 {% include '::modulesUsed/navigation.html.twig' %}
             </div>
             <div class="span9">
-                <h2>Valider mon parnier</h2>
-                <form>
-                    <table class="table table-striped table-hover">
-                        <thead>
-                        <tr>
-                            <th>Références</th>
-                            <th>Quantité</th>
-                            <th>Prix unitaire</th>
-                            <th>Total HT</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td>AB29837</td>
-                            <td>
-                                2
-                            </td>
-                            <td>333,33€</td>
-                            <td>333,33€</td>
-                        </tr>
-                        <tr>
-                            <td>AC34423</td>
-                            <td>
-                                1
-                            </td>
-                            <td>333,33€</td>
-                            <td>666,66€</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </form>
 
+                {% for flashMessage in app.session.flashBag.get('success') %}
+                    <div class="alert alert-success">
+                        {{ flashMessage }}
+                    </div>
+                {% endfor %}
+                <h2>Valider mon panier</h2>
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th>Aperçu</th>
+                        <th>Références</th>
+                        <th>Quantité</th>
+                        <th>Prix unitaire</th>
+                        <th>Total HT</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if produits | length == 0 %}
+                        <tr>
+                            <td colspan="4" style="text-align: center;">Votre panier est vide.</td>
+                        </tr>
+                    {% endif %}
+                    {% for produit in produits %}
+
+                        <tr>
+                            <td><img src="{{ asset(produit.image.path) }}" width="50" height="50"></td>
+                            <td style="vertical-align: middle;">{{ produit.nom }}</td>
+                            <td style="vertical-align: middle;">
+                                {{ panier[produit.id] }}
+                            </td>
+                            <td style="vertical-align: middle;">{{ produit.prix }}€</td>
+                            <td style="vertical-align: middle;">{{ produit.prix * panier[produit.id] }}€</td>
+                        </tr>
+
+                        {% set totalHT = totalHT + (produit.prix * panier[produit.id]) %}
+                        {% set totalTTC = totalTTC + (produit.prix * panier[produit.id]) | tva(produit.tva.multiplicate) %}
+
+                    {% endfor %}
+
+                    </tbody>
+                </table>
                 <dl class="dl-horizontal pull-right">
                     <dt>Total HT :</dt>
-                    <dd>799,99€</dd>
-
+                    <dd>{{ totalHT }}€</dd>
                     <dt>TVA :</dt>
-                    <dd>200€</dd>
-
+                    <dd>{{ totalTTC - totalHT }}€</dd>
                     <dt>Total:</dt>
-                    <dd>999,99€ TTC</dd>
+                    <dd>{{ totalTTC }}€</dd>
                 </dl>
+
+                <div class="span3 pull-left">
+                    <dl class="pull-left">
+                        <dt><h4>Adresse de livraison</h4></dt>
+                        <dt>{{ livraison.prenom }} {{ livraison.nom }}</dt>
+                        <dt>{{ livraison.adresse }}</dt>
+                        <dt>{{ livraison.cp }} {{ livraison.ville }}
+                            - {{ livraison.pays }}</dt>
+                    </dl>
+                </div>
+
+                <div class="span3 pull-left">
+                    <dl class="pull-left">
+                        <dt><h4>Adresse de facturation</h4></dt>
+                        <dt>{{ facturation.prenom }} {{ facturation.nom }}</dt>
+                        <dt>{{ facturation.adresse }}</dt>
+                        <dt>{{ facturation.cp }} {{ facturation.ville }}
+                            - {{ facturation.pays }}</dt>
+                    </dl>
+                </div>
                 <div class="clearfix"></div>
-                <a href="#" class="btn btn-success pull-right">Payer</a>
+                <a class="btn btn-success pull-right">Payer</a>
+                <a href="{{ path('livraison') }}" class="btn btn-primary">Retour</a>
             </div>
 
         </div>
     </div>
-{%  endblock %}
+{% endblock %}
