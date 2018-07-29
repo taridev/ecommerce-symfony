@@ -1,4 +1,8 @@
 services:
+    setNewReference:
+      class: Ecommerce\EcommerceBundle\Services\GetReference
+      arguments: [@security.context, @doctrine.orm.entity_manager]
+
     app.twig_extension:
         class: Ecommerce\EcommerceBundle\Twig\Extension\TvaExtension
         public: false

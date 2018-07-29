@@ -36,8 +36,7 @@ class ProduitsController extends Controller
             'EcommerceBundle:Default:produits/layout/produits.html.twig',
             array(
                 'produits' => $produits,
-                'panier' => $panier,
-            )
+                'panier' => $panier,)
         );
     }
 
